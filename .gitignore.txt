@@ -1,0 +1,14 @@
+# NetBeans specific
+/nbproject/private/
+/build/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Java specific
+*.class
+*.log
+
+# Mac specific (Eğer Mac kullanıyorsan veya ekipte kullanan varsa)
+.DS_Store
+
