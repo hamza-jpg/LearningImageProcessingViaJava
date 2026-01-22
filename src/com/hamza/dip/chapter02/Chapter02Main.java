@@ -14,8 +14,9 @@ public class Chapter02Main {
         BufferedImage image = ImageUtils.readImage(filename);
         toGrayScale(image);
         //toBinary(image, 127);
-        BufferedImage small = scaleImage(image, 0.5);
-        BufferedImage big = scaleImage(image, 2.0);
+        //BufferedImage small = scaleImage(image, 0.5);
+        BufferedImage big = scaleImage(image, 3.0);
+        BufferedImage bigBilinear = scaleImageBilinear(image, 3.0);
         
         if(image != null) {
             System.out.println("Image has been loaded succesfully!");
@@ -23,8 +24,9 @@ public class Chapter02Main {
             System.out.println("Height: " + image.getHeight() + " px");
             
             ImageUtils.showImage(image, "Original Image - Chapter 2");
-            ImageUtils.showImage(small, "Small");
-            ImageUtils.showImage(big, "big");
+            //ImageUtils.showImage(small, "Small");
+            ImageUtils.showImage(big, "big with Nearest Neighbor method");
+            ImageUtils.showImage(bigBilinear, "big with Bilinear Interpolation method");
         }
         
         else {
@@ -104,11 +106,10 @@ public class Chapter02Main {
         }
     }
     
-    // A method for playing with the resolution of the image
+    // A method for playing with the resolution of the image (Nearest Neighbor)
     public static BufferedImage scaleImage(BufferedImage img, double factor) {
          int width = img.getWidth();
          int height = img.getHeight();
-         
          int newWidth = (int) (width * factor);
          int newHeight = (int) (height * factor);
          
@@ -134,5 +135,53 @@ public class Chapter02Main {
          }
          
          return newImg;
+    }
+    
+    // A method for playing with the resolution of the image (Bilinear Interpolation)
+    // Just for a greyscale image thus it works with one random channel Red=Green=Blue
+    public static BufferedImage scaleImageBilinear(BufferedImage img, double factor) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+        int newWidth = (int) (width * factor);
+        int newHeight = (int) (height * factor);
+        
+        BufferedImage newImg = new BufferedImage(newWidth, newHeight, img.getType());
+        
+        for(int x = 0; x < newWidth; x++) {
+            for(int y = 0; y < newHeight; y++) {
+                
+                 // finding the old coordinates as double values
+                 double srcX = x / factor;
+                 double srcY = y / factor;
+                 
+                 // finding the left and top neighbors
+                 int srcXi = (int) srcX;
+                 int srcYi = (int) srcY;
+                 
+                 // finding the weights
+                 double dx = srcX - srcXi;
+                 double dy = srcY - srcYi;
+                 
+                 // determining 4 neighbors imagine a cross shape
+                 int x1 = srcXi;
+                 int y1 = srcYi;
+                 int x2 = Math.min(srcXi + 1, width - 1); // to prevent overflow we use Math.min
+                 int y2 = Math.min(srcYi + 1, height - 1);
+                 
+                 // taking color values of each neighbors
+                 Color c11 = new Color(img.getRGB(x1, y1)); // Upper-left
+                 Color c21 = new Color(img.getRGB(x2, y1)); // Upper-right
+                 Color c12 = new Color(img.getRGB(x1, y2)); // Bottom-left
+                 Color c22 = new Color(img.getRGB(x2, y2)); // Bottom-right
+                 
+                 double topRed = (c11.getRed()*(1-dx)) + (c21.getRed()*(dx));
+                 double bottomRed = (c12.getRed()*(1-dx)) + (c22.getRed()*(dx));
+                 double finalRed = (topRed*(1-dy)) + (bottomRed*(dy));
+                 
+                 Color newColor = new Color((int)finalRed, (int)finalRed, (int)finalRed);
+                 newImg.setRGB(x, y, newColor.getRGB());
+            }
+        }
+        return newImg;
     }
 }
