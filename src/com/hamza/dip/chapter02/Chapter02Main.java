@@ -12,15 +12,19 @@ public class Chapter02Main {
         System.out.println("Reading image: " + filename);
         
         BufferedImage image = ImageUtils.readImage(filename);
+        toGrayScale(image);
+        //toBinary(image, 127);
+        BufferedImage small = scaleImage(image, 0.5);
+        BufferedImage big = scaleImage(image, 2.0);
         
         if(image != null) {
             System.out.println("Image has been loaded succesfully!");
             System.out.println("Width: " + image.getWidth() + " px");
             System.out.println("Height: " + image.getHeight() + " px");
             
-            toGrayScale(image);
-            toBinary(image, 127);
             ImageUtils.showImage(image, "Original Image - Chapter 2");
+            ImageUtils.showImage(small, "Small");
+            ImageUtils.showImage(big, "big");
         }
         
         else {
@@ -102,6 +106,33 @@ public class Chapter02Main {
     
     // A method for playing with the resolution of the image
     public static BufferedImage scaleImage(BufferedImage img, double factor) {
-        
+         int width = img.getWidth();
+         int height = img.getHeight();
+         
+         int newWidth = (int) (width * factor);
+         int newHeight = (int) (height * factor);
+         
+         // New image for new scaled image
+         BufferedImage newImg = new BufferedImage(newWidth, newHeight, img.getType());
+         
+         // Iterating through pixels of new image
+         for(int x = 0; x < newWidth; x++) {
+             for(int y = 0; y < newHeight; y++) {
+                 
+                 // Finding the old coordinates
+                 int srcX = (int) (x / factor);
+                 int srcY = (int) (y / factor);
+                 
+                 // Limiting pixel overflow
+                 srcX = Math.min(srcX,  width - 1);
+                 srcY = Math.min(srcY, height - 1);
+                 
+                 // Copying the color of the original pixel to the new pixel.
+                 int color = img.getRGB(srcX, srcY);
+                 newImg.setRGB(x, y, color);
+             }
+         }
+         
+         return newImg;
     }
 }
