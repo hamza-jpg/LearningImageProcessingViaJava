@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.awt.Color;
 
 public class Chapter02Main {
-    
     public static void main(String[] args) {
         String filename = "images/test.jpg";
         
@@ -28,7 +27,6 @@ public class Chapter02Main {
             ImageUtils.showImage(big, "big with Nearest Neighbor method");
             ImageUtils.showImage(bigBilinear, "big with Bilinear Interpolation method");
         }
-        
         else {
             System.out.println("Error: Image has not found!");
         }
