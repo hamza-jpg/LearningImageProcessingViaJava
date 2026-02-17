@@ -3,6 +3,7 @@ package com.hamza.dip.chapter03;
 import com.hamza.dip.utils.ImageUtils;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
+import java.awt.Graphics2D;
 
 public class Chapter03Main {
     public static void main(String[] args) {
@@ -11,6 +12,14 @@ public class Chapter03Main {
         BufferedImage image = ImageUtils.readImage(filename);
         //toGrey(image);
         histogramEq(image);
+        
+        // drawing the graph
+        int[] greylevels = countGreyLevels(image);
+        
+        BufferedImage histogramGraph = getGraph(greylevels);
+        
+        ImageUtils.showImage(histogramGraph, "Original Image's histogram graph - Chapter 3");
+        
         if(image != null) {            
             ImageUtils.showImage(image, "Original Image - Chapter 3");
         }
@@ -142,5 +151,42 @@ public class Chapter03Main {
         }
         
         return CDFs;
+    }
+    
+    public static int findMax(int[] greylevels) {
+        
+        int max = greylevels[0];
+        
+        for(int i = 0; i < greylevels.length; i++) {
+            if(greylevels[i] > max) {
+                max = greylevels[i];
+            }
+        }
+        
+        return max;
+    }
+    
+    public static BufferedImage getGraph(int[] greylevels) {
+        
+        BufferedImage graph = new BufferedImage(256, 300, BufferedImage.TYPE_INT_RGB);
+        
+        Graphics2D g2d = graph.createGraphics();
+        
+        int max = findMax(greylevels);
+        
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, 256, 300);
+        
+        g2d.setColor(Color.BLACK);
+        
+        for(int i = 0; i < greylevels.length; i++) {
+            int h = (300 * greylevels[i]) / max;
+            
+            g2d.drawLine(i, 300, i, 300-h);
+        }
+        
+        g2d.dispose();
+        
+        return graph;
     }
 }
